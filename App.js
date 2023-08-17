@@ -5,20 +5,30 @@ import { StyleSheet, Text, View, ScrollView, Image, ImageBackground } from 'reac
 
 export default function App() {
 
-  const [ filmes, setFilmes ] = useState(null);
 
-   const fetchTheMovieDB = async () => {
-    let response = await fetch('https://api.themoviedb.org/3//movie/popular?language=pt-BR', { 
+  const [ filmesAventura, setFilmesAventura ] = useState(null);
+  const [ filmesRomance, setFilmesRomance ] = useState(null);
+  const [ filmesTerror, setFilmesTerror ] = useState(null);
+
+   const fetchTheMovieDB = async genreId => {
+    const header = { 
       'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwOWY5MTAyZTAxNzQzMWJhZGZiNDBkMDA4ZjY1NDEzNSIsInN1YiI6IjYzZWY4ZDQ2ZWE4NGM3MDA5NmVmYTE0NyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.pX14UtP6uIfifrvNvEO0kia6o_gC5N_iydUf9sII1Fk',
       'accept': 'application/json'
-     })
+     }
+    const response = await fetch(`https://api.themoviedb.org/3/discover/movie?language=pt-BR&with_genres=${genreId}`, { headers: header })
     return response
   }
 
   useEffect(() => {
-    fetchTheMovieDB()
-     .then(response => response.json())
-     .then(data => setFilmes(data.results))
+    fetchTheMovieDB(12)
+      .then(response => response.json())
+      .then(data => setFilmesAventura(data.results))
+    fetchTheMovieDB(10749)
+      .then(response => response.json())
+      .then(data => setFilmesRomance(data.results))
+    fetchTheMovieDB(27)
+      .then(response => response.json())
+      .then(data => setFilmesTerror(data.results))
   }, [])
 
   return (
@@ -28,10 +38,26 @@ export default function App() {
           <Image source={require('./assets/logo netflix png.png')} style={styles.logo}/>
         </View>
         <View style={styles.a1}>
-          <Text style={styles.titulo}>Filmes</Text>
+          <Text style={styles.titulo}>Aventura</Text>
           <ScrollView horizontal={true} style={styles.fundoViewHorizontal}>
             {
-              filmes ? filmes.map((e) => <Filme key={e.id} url={e.backdrop_path}  titulo={e.title}/>) : <View></View>
+              filmesAventura ? filmesAventura.map((e) => <Filme key={e.id} url={e.backdrop_path}  titulo={e.title}/>) : <View></View>
+            }
+          </ScrollView>
+        </View>
+        <View style={styles.a1}>
+          <Text style={styles.titulo}>Romance</Text>
+          <ScrollView horizontal={true} style={styles.fundoViewHorizontal}>
+            {
+              filmesRomance ? filmesRomance.map((e) => <Filme key={e.id} url={e.backdrop_path}  titulo={e.title}/>) : <View></View>
+            }
+          </ScrollView>
+        </View>
+        <View style={styles.a1}>
+          <Text style={styles.titulo}>Terror</Text>
+          <ScrollView horizontal={true} style={styles.fundoViewHorizontal}>
+            {
+              filmesTerror ? filmesTerror.map((e) => <Filme key={e.id} url={e.backdrop_path}  titulo={e.title}/>) : <View></View>
             }
           </ScrollView>
         </View>
