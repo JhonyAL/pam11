@@ -5,30 +5,75 @@ import { StyleSheet, Text, View, ScrollView, Image, ImageBackground } from 'reac
 
 export default function App() {
 
+  const [ filmes, setFIlmes ] = useState(null)
 
-  const [ filmesAventura, setFilmesAventura ] = useState(null);
-  const [ filmesRomance, setFilmesRomance ] = useState(null);
-  const [ filmesTerror, setFilmesTerror ] = useState(null);
-
-   const fetchTheMovieDB = async genreId => {
+  const fetchTheMovieDB = async genresId => {
     const header = { 
       'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwOWY5MTAyZTAxNzQzMWJhZGZiNDBkMDA4ZjY1NDEzNSIsInN1YiI6IjYzZWY4ZDQ2ZWE4NGM3MDA5NmVmYTE0NyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.pX14UtP6uIfifrvNvEO0kia6o_gC5N_iydUf9sII1Fk',
       'accept': 'application/json'
-     }
-    const response = await fetch(`https://api.themoviedb.org/3/discover/movie?language=pt-BR&with_genres=${genreId}`, { headers: header })
+    }
+    let genres = ''
+    genresId.forEach(e => {
+      genres += `${e}|`
+    });
+    
+    const response = await fetch(`https://api.themoviedb.org/3/discover/movie?language=pt-BR&with_genres=${genres}`, { headers: header })
     return response
   }
 
+  const viewFilmes = () => {
+    let filmesAventura = []
+    let filmesRomance = []
+    let filmesTerror = []
+
+    filmes.forEach(e => {
+      e.genre_ids.forEach(id => {
+        if (id == 12) {
+          filmesAventura.push(e)
+        }
+        if (id == 27){
+          filmesRomance.push(e)
+        }
+        if (id == 10749){
+          filmesTerror.push(e)
+        }
+      })
+    })
+
+    return (
+      <>
+        <View style={styles.a1}>
+          <Text style={styles.titulo}>Aventura</Text>
+          <ScrollView horizontal={true} style={styles.fundoViewHorizontal}>
+            {
+              filmesAventura ? filmesAventura.map((e) => <Filme key={e.id} url={e.backdrop_path}  titulo={e.title}/>) : null
+            }
+          </ScrollView>
+        </View>
+        <View style={styles.a1}>
+          <Text style={styles.titulo}>Terror</Text>
+          <ScrollView horizontal={true} style={styles.fundoViewHorizontal}>
+            {
+              filmesRomance ? filmesRomance.map((e) => <Filme key={e.id} url={e.backdrop_path}  titulo={e.title}/>) : null
+            }
+          </ScrollView>
+        </View>
+        <View style={styles.a1}>
+          <Text style={styles.titulo}>Romance</Text>
+          <ScrollView horizontal={true} style={styles.fundoViewHorizontal}>
+            {
+              filmesTerror ? filmesTerror.map((e) => <Filme key={e.id} url={e.backdrop_path}  titulo={e.title}/>) : null
+            }
+          </ScrollView>
+        </View>
+      </>
+    );
+  }
+
   useEffect(() => {
-    fetchTheMovieDB(12)
+    fetchTheMovieDB([12, 27, 10749])
       .then(response => response.json())
-      .then(data => setFilmesAventura(data.results))
-    fetchTheMovieDB(10749)
-      .then(response => response.json())
-      .then(data => setFilmesRomance(data.results))
-    fetchTheMovieDB(27)
-      .then(response => response.json())
-      .then(data => setFilmesTerror(data.results))
+      .then(data => setFIlmes(data.results))
   }, [])
 
   return (
@@ -37,30 +82,10 @@ export default function App() {
         <View style={styles.top}>
           <Image source={require('./assets/logo netflix png.png')} style={styles.logo}/>
         </View>
-        <View style={styles.a1}>
-          <Text style={styles.titulo}>Aventura</Text>
-          <ScrollView horizontal={true} style={styles.fundoViewHorizontal}>
-            {
-              filmesAventura ? filmesAventura.map((e) => <Filme key={e.id} url={e.backdrop_path}  titulo={e.title}/>) : <View></View>
-            }
-          </ScrollView>
-        </View>
-        <View style={styles.a1}>
-          <Text style={styles.titulo}>Romance</Text>
-          <ScrollView horizontal={true} style={styles.fundoViewHorizontal}>
-            {
-              filmesRomance ? filmesRomance.map((e) => <Filme key={e.id} url={e.backdrop_path}  titulo={e.title}/>) : <View></View>
-            }
-          </ScrollView>
-        </View>
-        <View style={styles.a1}>
-          <Text style={styles.titulo}>Terror</Text>
-          <ScrollView horizontal={true} style={styles.fundoViewHorizontal}>
-            {
-              filmesTerror ? filmesTerror.map((e) => <Filme key={e.id} url={e.backdrop_path}  titulo={e.title}/>) : <View></View>
-            }
-          </ScrollView>
-        </View>
+        {
+          filmes ? viewFilmes() : <></>
+        }
+        
       </ScrollView>
     </ImageBackground>
   );
