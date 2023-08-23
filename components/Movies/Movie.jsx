@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image } from 'react-native';
 
-export default function App(props) {
+export function Movie(props) {
   const url = `https://www.themoviedb.org/t/p/original/${props.url}`
 
   return (
